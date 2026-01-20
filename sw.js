@@ -1,10 +1,12 @@
-const CACHE_NAME = "dar-risk-2026-v1";
+const BASE = "/DM-Risk2026";
+const CACHE_NAME = "dar-risk-2026-v2";
+
 const ASSETS = [
-  "/DM-Risk2026/",
-  "/DM-Risk2026/index.html",
-  "/DM-Risk2026/manifest.webmanifest",
-  "/DM-Risk2026/icons/icon-192.png",
-  "/DM-Risk2026/icons/icon-512.png"
+  `${BASE}/`,
+  `${BASE}/index.html`,
+  `${BASE}/manifest.webmanifest`,
+  `${BASE}/icons/icon-192.png`,
+  `${BASE}/icons/icon-512.png`
 ];
 
 self.addEventListener("install", (event) => {
