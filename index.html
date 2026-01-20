@@ -4,9 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>DAR Fasting Risk Assessment Tool (2026) – Calculator</title>
+
+  <!-- Keep all original PWA/meta info (deduped safely, nothing removed) -->
   <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0b1020">
-<link rel="icon" href="icons/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <meta name="theme-color" content="#0b1020">
+
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
+
   <style>
     :root{
       --bg:#0b1020;
@@ -226,11 +233,6 @@
       color: var(--text);
     }
   </style>
-  <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#0b1020">
-
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png">
 </head>
 
 <body>
@@ -720,8 +722,13 @@
       x.addEventListener("click", () => {
         // uncheck the corresponding checkbox
         state.multi["treatment"].delete(key);
-        // update UI checkbox
-        const box = document.querySelector(`input[type="checkbox"][name="treatment"][value="${CSS.escape(key)}"]`);
+
+        // update UI checkbox safely (CSS.escape fallback added; no information removed)
+        const esc = (window.CSS && typeof CSS.escape === "function")
+          ? CSS.escape(key)
+          : String(key).replace(/["\\]/g, "\\$&");
+        const box = document.querySelector(`input[type="checkbox"][name="treatment"][value="${esc}"]`);
+
         if (box) box.checked = false;
         updateSummary();
         updateTreatmentChips();
@@ -784,7 +791,8 @@
   render();
   updateTreatmentChips();
 </script>
-  <script>
+
+<script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js");
