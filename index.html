@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>DAR Fasting Risk Assessment Tool (2026) – Calculator</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#111a33;
+      --card2:#0f1730;
+      --text:#e9eeff;
+      --muted:#b8c2ffcc;
+      --line:#2a3a78;
+      --good:#38d39f;
+      --warn:#f7c948;
+      --bad:#ff5c7a;
+      --btn:#1f2d5c;
+      --btn2:#26366f;
+      --chip:#1b2750;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 20% 0%, #142055 0%, var(--bg) 55%);
+      color:var(--text);
+      padding:24px;
+    }
+    .wrap{max-width:1100px;margin:0 auto}
+    header{
+      display:flex; gap:14px; flex-wrap:wrap;
+      align-items:flex-end; justify-content:space-between;
+      margin-bottom:16px;
+    }
+    h1{
+      font-size:22px; margin:0;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.35;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap:16px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 16px;
+      background: rgba(255,255,255,.03);
+      border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .card .hd strong{font-size:14px}
+    .card .bd{padding:14px 16px}
+    details{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      background: rgba(255,255,255,.02);
+      margin:10px 0;
+      overflow:hidden;
+    }
+    details[open]{background: rgba(255,255,255,.03)}
+    summary{
+      cursor:pointer;
+      list-style:none;
+      padding:12px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      user-select:none;
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    summary::-webkit-details-marker{display:none}
+    .sumL{
+      display:flex; flex-direction:column; gap:3px;
+    }
+    .sumL .t{font-weight:700; font-size:14px}
+    .sumL .d{color:var(--muted); font-size:12px}
+    .chev{opacity:.9}
+    .section{
+      padding:12px 14px;
+    }
+    .options{
+      display:grid;
+      gap:10px;
+    }
+    .opt{
+      display:flex; align-items:flex-start; gap:10px;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
+    }
+    .opt:hover{border-color: rgba(255,255,255,.16)}
+    .opt input{margin-top:3px; transform:scale(1.05)}
+    .opt .txt{flex:1}
+    .opt .lbl{font-weight:600; font-size:13px; margin:0}
+    .opt .meta{font-size:12px; color:var(--muted); margin:3px 0 0}
+    .opt .score{
+      font-variant-numeric: tabular-nums;
+      font-weight:800;
+      padding:4px 8px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      min-width:56px;
+      text-align:center;
+    }
+
+    .sideTop{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .bigScore{
+      display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+    }
+    .bigScore .n{
+      font-size:44px; font-weight:900; letter-spacing:.5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .pill{
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .riskBox{
+      display:flex; flex-direction:column; gap:10px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.12);
+    }
+    .riskBadge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      font-weight:800;
+      width:max-content;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .riskBadge.low{background: rgba(56,211,159,.12); color: #bff7e6; border-color: rgba(56,211,159,.25)}
+    .riskBadge.mod{background: rgba(247,201,72,.12); color: #fff3c4; border-color: rgba(247,201,72,.25)}
+    .riskBadge.high{background: rgba(255,92,122,.12); color: #ffd1da; border-color: rgba(255,92,122,.25)}
+    .riskBadge.none{background: rgba(255,255,255,.06); color: var(--text)}
+    .mini{
+      font-size:12px; color:var(--muted); line-height:1.45;
+    }
+
+    .btns{
+      display:flex; flex-wrap:wrap; gap:10px;
+    }
+    button{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      color: var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    button:hover{border-color: rgba(255,255,255,.22)}
+    button.secondary{background: rgba(0,0,0,.12)}
+    .chips{
+      display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      font-size:12px;
+      color: var(--text);
+    }
+    .chip .x{
+      width:18px; height:18px;
+      display:inline-grid; place-items:center;
+      border-radius:6px;
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.12);
+      cursor:pointer;
+      font-weight:900;
+      line-height:1;
+      opacity:.95;
+    }
+    .legend{
+      display:grid;
+      gap:8px;
+      font-size:12px;
+      color: var(--muted);
+    }
+    .legend b{color:var(--text)}
+    .footerNote{
+      margin-top:12px; font-size:11px; color: var(--muted);
+      opacity:.9;
+    }
+    .k{
+      font-variant-numeric: tabular-nums;
+      padding:2px 6px;
+      border-radius:8px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color: var(--text);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>DAR Fasting Risk Assessment Tool (2026) – Risk Score Calculator</h1>
+        <p class="sub">
+          Select one option in each section (except <b>Diabetes treatment</b> which allows multiple selections).
+          Total score updates instantly.
+        </p>
+      </div>
+      <div class="pill">GitHub Pages ready (single HTML file)</div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: FORM -->
+      <div class="card">
+        <div class="hd">
+          <strong>Risk Elements</strong>
+          <span class="pill">Auto-calculated</span>
+        </div>
+        <div class="bd" id="formRoot">
+          <!-- Sections injected by JS -->
+        </div>
+      </div>
+
+      <!-- RIGHT: SUMMARY -->
+      <div class="card">
+        <div class="hd">
+          <strong>Result</strong>
+          <span class="pill">Low 1–3 • Moderate 3.5–6 • High &gt; 6</span>
+        </div>
+        <div class="bd">
+          <div class="sideTop">
+            <div class="riskBox">
+              <div class="bigScore">
+                <div>
+                  <div class="mini">Total Risk Score</div>
+                  <div class="n" id="totalScore">0.0</div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+                  <div class="riskBadge none" id="riskBadge">No category</div>
+                  <div class="mini" id="riskHint">Select options to calculate.</div>
+                </div>
+              </div>
+
+              <div class="legend">
+                <div><b>Low risk</b>: total <span class="k">1.0</span> to <span class="k">3.0</span></div>
+                <div><b>Moderate risk</b>: total <span class="k">3.5</span> to <span class="k">6.0</span></div>
+                <div><b>High risk</b>: total <span class="k">&gt; 6.0</span></div>
+              </div>
+            </div>
+
+            <div class="riskBox">
+              <div class="mini"><b>Selected treatment items</b> (multi-select)</div>
+              <div class="chips" id="treatmentChips"></div>
+              <div class="footerNote">Tip: click the <b>×</b> on a chip to remove it.</div>
+            </div>
+
+            <div class="btns">
+              <button id="btnReset" class="secondary" type="button">Reset all</button>
+              <button id="btnCopy" type="button">Copy summary</button>
+            </div>
+
+            <div class="footerNote">
+              Built from the “DAR Risk Assessment Tool (2026)” table. This is a scoring calculator only.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ---------- DATA (from DAR Risk Assessment Tool 2026 table) ----------
+  // For each section: type = "single" (radio) or "multi" (checkbox)
+  const SECTIONS = [
+    {
+      id: "pregnancy",
+      title: "1. Pregnancy with any type of diabetes",
+      desc: "Select if currently pregnant with diabetes.",
+      type: "single",
+      options: [
+        { key: "yes", label: "Yes", details: "", score: 6.5 },
+        { key: "no",  label: "No",  details: "", score: 0 }
+      ],
+      defaultKey: "no"
+    },
+    {
+      id: "dtype",
+      title: "2. Diabetes type",
+      desc: "Choose the diabetes type.",
+      type: "single",
+      options: [
+        { key: "t1", label: "Type 1 diabetes or LADA", details: "", score: 1 },
+        { key: "t2", label: "Type 2 diabetes or any other type of diabetes", details: "", score: 0 }
+      ],
+      defaultKey: "t2"
+    },
+    {
+      id: "duration",
+      title: "3. Duration of diabetes (years)",
+      desc: "Duration since diagnosis.",
+      type: "single",
+      options: [
+        { key: "gt20", label: "> 20 years", details: "", score: 1 },
+        { key: "10to20", label: "10–20 years", details: "", score: 0.5 },
+        { key: "lt10", label: "< 10 years", details: "", score: 0 }
+      ],
+      defaultKey: "lt10"
+    },
+    {
+      id: "treatment",
+      title: "4. Type of diabetes treatment (select all that are relevant)",
+      desc: "Multi-select (medications/treatment).",
+      type: "multi",
+      icon: "💊", // shown on option line (can be changed)
+      options: [
+        { key: "mdpi", label: "Multiple daily premixed insulin injections", details: "🩸💉", score: 2 },
+        { key: "odpi", label: "Once daily premixed insulin", details: "🩸💉", score: 1.5 },
+        { key: "openloop", label: "Open loop insulin pump", details: "🔁", score: 1.5 },
+        { key: "aid", label: "Automated insulin delivery system", details: "🤖", score: 1 },
+        { key: "basal_std", label: "Standard basal insulin (NPH, Detemir or Glargine 100)", details: "", score: 1 },
+        { key: "basal_ultra", label: "Ultra long-acting basal insulin (Glargine 300 or Degludec)", details: "", score: 0.75 },
+        { key: "shortacting", label: "Short acting insulin", details: "", score: 0.75 },
+        { key: "glib_or_glip", label: "Glibenclamide or Glipizide", details: "Sulfonylurea", score: 0.75 },
+        { key: "modern_su_or_rep", label: "Modern sulfonylurea (Gliclazide, Gliclazide MR, Glimepiride) or Repaglinide", details: "", score: 0.5 },
+        { key: "ge2_nonins", label: "≥2 glucose-lowering medications excluding insulin or sulfonylurea", details: "", score: 0.25 },
+        { key: "diet_or_mono", label: "Nutrition modification only or monotherapy (excluding insulin or sulfonylurea)", details: "", score: 0 }
+      ],
+      defaultKeys: []
+    },
+    {
+      id: "hypo",
+      title: "5. Presence of hypoglycemia",
+      desc: "Pick the best matching frequency/severity.",
+      type: "single",
+      options: [
+        { key: "unaware", label: "Impaired hypoglycemia awareness", details: "", score: 6.5 },
+        { key: "severe_4w", label: "Severe hypoglycemia during last 4 weeks", details: "", score: 5 },
+        { key: "more_than_once_daily", label: "Hypoglycemia more than once daily", details: "", score: 4 },
+        { key: "6to7wk", label: "6–7 episodes of hypoglycemia/week", details: "", score: 3 },
+        { key: "3to5wk", label: "3–5 episodes of hypoglycemia/week", details: "", score: 2 },
+        { key: "1to2wk", label: "1–2 episodes of hypoglycemia/week", details: "", score: 1 },
+        { key: "lt1wk", label: "Hypoglycemia <1 time per week", details: "", score: 0.5 },
+        { key: "none_4w", label: "No hypoglycemia in last 4 weeks", details: "", score: 0 }
+      ],
+      defaultKey: "none_4w"
+    },
+    {
+      id: "a1c",
+      title: "6. Level of A1c",
+      desc: "Select the most recent A1c category.",
+      type: "single",
+      options: [
+        { key: "gt9", label: "> 9% (>75 mmol/mol)", details: "", score: 1 },
+        { key: "7_5to9", label: "7.5–9% (58–75 mmol/mol)", details: "", score: 0.5 },
+        { key: "lt7_5", label: "< 7.5% (<58 mmol/mol)", details: "", score: 0 }
+      ],
+      defaultKey: "lt7_5"
+    },
+    {
+      id: "gmon",
+      title: "7. Glucose monitoring",
+      desc: "Choose monitoring status (CGM reduces score).",
+      type: "single",
+      options: [
+        { key: "not_done", label: "Not done", details: "", score: 2 },
+        { key: "suboptimal", label: "Suboptimally done", details: "", score: 1 },
+        { key: "as_indicated", label: "Done as indicated", details: "", score: 0 },
+        { key: "cgm", label: "Any type of CGM", details: "", score: -0.5 }
+      ],
+      defaultKey: "as_indicated"
+    },
+    {
+      id: "hyper_emerg",
+      title: "8. Hyperglycemic emergencies",
+      desc: "DKA or HHS timing.",
+      type: "single",
+      options: [
+        { key: "last_month", label: "DKA or HHS in the last month", details: "", score: 3.5 },
+        { key: "2to3m", label: "DKA or HHS in last 2–3 months", details: "", score: 2 },
+        { key: "4to6m", label: "DKA or HHS in last 4–6 months", details: "", score: 1 },
+        { key: "none6m", label: "No DKA or HHS in the last 6 months", details: "", score: 0 }
+      ],
+      defaultKey: "none6m"
+    },
+    {
+      id: "macro",
+      title: "9. Macrovascular complications",
+      desc: "Cardiovascular disease status.",
+      type: "single",
+      options: [
+        { key: "unstable", label: "Unstable macrovascular disease", details: "", score: 6.5 },
+        { key: "stable", label: "Stable macrovascular disease", details: "", score: 2 },
+        { key: "none", label: "No macrovascular disease", details: "", score: 0 }
+      ],
+      defaultKey: "none"
+    },
+    {
+      id: "micro_neph",
+      title: "10a. Microvascular complications – nephropathy",
+      desc: "eGFR category.",
+      type: "single",
+      options: [
+        { key: "lt30", label: "eGFR < 30 mL/min", details: "", score: 6.5 },
+        { key: "30to45", label: "eGFR 30–45 mL/min", details: "", score: 4 },
+        { key: "45to60", label: "eGFR 45–60 mL/min", details: "", score: 2 },
+        { key: "gt60", label: "eGFR > 60 mL/min", details: "", score: 0 }
+      ],
+      defaultKey: "gt60"
+    },
+    {
+      id: "micro_other",
+      title: "10b. Microvascular complications – neuropathy, foot complications, or diabetic retinopathy",
+      desc: "Count microvascular complications (excluding nephropathy above).",
+      type: "single",
+      options: [
+        { key: "3", label: "3 microvascular complications", details: "", score: 3 },
+        { key: "2", label: "2 microvascular complications", details: "", score: 2 },
+        { key: "1", label: "1 microvascular complication", details: "", score: 1 },
+        { key: "0", label: "0 microvascular complications", details: "", score: 0 }
+      ],
+      defaultKey: "0"
+    },
+    {
+      id: "cog_frail_age",
+      title: "11. Cognitive function, frailty, and age",
+      desc: "Select the best matching item.",
+      type: "single",
+      options: [
+        { key: "imp_cog", label: "Impaired cognitive function", details: "", score: 6.5 },
+        { key: "adv_frail", label: "Advanced frailty", details: "", score: 6.5 },
+        { key: "mild_mod_frail", label: "Mild to moderate frailty", details: "", score: 4 },
+        { key: "age70_no_support", label: "Age > 70 years with no home support", details: "", score: 1 },
+        { key: "normal", label: "Normal cognitive function and no frailty", details: "", score: 0 }
+      ],
+      defaultKey: "normal"
+    },
+    {
+      id: "labor",
+      title: "12. Physical labor",
+      desc: "Work intensity during fasting period.",
+      type: "single",
+      options: [
+        { key: "high", label: "High intensity", details: "", score: 4 },
+        { key: "moderate", label: "Moderate intensity", details: "", score: 2 },
+        { key: "low", label: "Low intensity", details: "", score: 0 }
+      ],
+      defaultKey: "low"
+    },
+    {
+      id: "education",
+      title: "13. Fasting focused education",
+      desc: "Education done or not.",
+      type: "single",
+      options: [
+        { key: "yes", label: "Yes", details: "", score: 0 },
+        { key: "no", label: "No", details: "", score: 1 }
+      ],
+      defaultKey: "yes"
+    },
+    {
+      id: "hours",
+      title: "14. Fasting hours",
+      desc: "Typical fasting duration.",
+      type: "single",
+      options: [
+        { key: "ge16", label: "≥ 16 hours", details: "", score: 1 },
+        { key: "lt16", label: "< 16 hours", details: "", score: 0 }
+      ],
+      defaultKey: "lt16"
+    },
+  ];
+
+  // ---------- STATE ----------
+  const state = {
+    // single-choice selections stored as {sectionId: optionKey}
+    single: {},
+    // multi-choice selections stored as {sectionId: Set(optionKey)}
+    multi: {}
+  };
+
+  // ---------- HELPERS ----------
+  const fmt = (n) => (Math.round(n * 100) / 100).toFixed(1);
+
+  function riskCategory(total){
+    // Per user thresholds:
+    // Low: 1–3
+    // Moderate: 3.5–6
+    // High: >6
+    // For totals between 0–0.9 or 3.01–3.49 -> show "Low" but clarify (nearest band).
+    if (total > 6) return { key:"high", label:"High risk", hint:"Total score is > 6." };
+    if (total >= 3.5 && total <= 6) return { key:"mod", label:"Moderate risk", hint:"Total score is between 3.5 and 6." };
+    if (total >= 1 && total <= 3) return { key:"low", label:"Low risk", hint:"Total score is between 1 and 3." };
+    if (total === 0) return { key:"none", label:"No category", hint:"Score is 0. (Check selections.)" };
+    // otherwise:
+    return { key:"low", label:"Low risk", hint:"Score is below moderate threshold." };
+  }
+
+  function getOptionByKey(section, key){
+    return section.options.find(o => o.key === key);
+  }
+
+  function computeTotal(){
+    let total = 0;
+
+    // singles
+    for (const section of SECTIONS.filter(s => s.type === "single")){
+      const key = state.single[section.id];
+      const opt = getOptionByKey(section, key);
+      if (opt) total += opt.score;
+    }
+
+    // multi
+    for (const section of SECTIONS.filter(s => s.type === "multi")){
+      const set = state.multi[section.id] || new Set();
+      for (const key of set){
+        const opt = getOptionByKey(section, key);
+        if (opt) total += opt.score;
+      }
+    }
+
+    return total;
+  }
+
+  // ---------- UI BUILD ----------
+  const formRoot = document.getElementById("formRoot");
+
+  function buildSection(section){
+    const details = document.createElement("details");
+    details.open = true;
+
+    const summary = document.createElement("summary");
+    const left = document.createElement("div");
+    left.className = "sumL";
+    left.innerHTML = `<div class="t">${section.title}</div><div class="d">${section.desc || ""}</div>`;
+    const chev = document.createElement("div");
+    chev.className = "chev";
+    chev.textContent = "▾";
+    summary.appendChild(left);
+    summary.appendChild(chev);
+
+    const inner = document.createElement("div");
+    inner.className = "section";
+
+    const options = document.createElement("div");
+    options.className = "options";
+
+    for (const opt of section.options){
+      const row = document.createElement("label");
+      row.className = "opt";
+
+      const input = document.createElement("input");
+      input.type = (section.type === "single") ? "radio" : "checkbox";
+      input.name = section.id;
+      input.value = opt.key;
+      input.dataset.section = section.id;
+      input.dataset.type = section.type;
+
+      // default selection
+      if (section.type === "single"){
+        const current = state.single[section.id];
+        input.checked = (current === opt.key);
+      } else {
+        const set = state.multi[section.id] || new Set();
+        input.checked = set.has(opt.key);
+      }
+
+      input.addEventListener("change", onInputChange);
+
+      const txt = document.createElement("div");
+      txt.className = "txt";
+
+      const labelLine = document.createElement("p");
+      labelLine.className = "lbl";
+
+      // "allow multiple entry on medications icon" → show icons in treatment section lines
+      const icon = (section.id === "treatment")
+        ? (opt.details ? `${opt.details} ` : "💊 ")
+        : "";
+
+      labelLine.textContent = `${icon}${opt.label}`;
+
+      const meta = document.createElement("p");
+      meta.className = "meta";
+      meta.textContent = (opt.details && section.id !== "treatment") ? opt.details : (section.id === "treatment" ? "" : "");
+
+      txt.appendChild(labelLine);
+      if (meta.textContent) txt.appendChild(meta);
+
+      const score = document.createElement("div");
+      score.className = "score";
+      score.textContent = opt.score;
+
+      row.appendChild(input);
+      row.appendChild(txt);
+      row.appendChild(score);
+      options.appendChild(row);
+    }
+
+    inner.appendChild(options);
+    details.appendChild(summary);
+    details.appendChild(inner);
+    return details;
+  }
+
+  function initState(){
+    // set defaults
+    for (const section of SECTIONS){
+      if (section.type === "single"){
+        state.single[section.id] = section.defaultKey ?? section.options[0].key;
+      } else {
+        state.multi[section.id] = new Set(section.defaultKeys ?? []);
+      }
+    }
+  }
+
+  function render(){
+    formRoot.innerHTML = "";
+    for (const section of SECTIONS){
+      formRoot.appendChild(buildSection(section));
+    }
+    updateSummary();
+  }
+
+  // ---------- EVENTS ----------
+  function onInputChange(e){
+    const input = e.target;
+    const sectionId = input.dataset.section;
+    const type = input.dataset.type;
+    const key = input.value;
+
+    if (type === "single"){
+      state.single[sectionId] = key;
+    } else {
+      if (!state.multi[sectionId]) state.multi[sectionId] = new Set();
+      if (input.checked) state.multi[sectionId].add(key);
+      else state.multi[sectionId].delete(key);
+    }
+    updateSummary();
+    updateTreatmentChips();
+  }
+
+  function updateSummary(){
+    const total = computeTotal();
+    document.getElementById("totalScore").textContent = fmt(total);
+
+    const cat = riskCategory(total);
+    const badge = document.getElementById("riskBadge");
+    badge.className = `riskBadge ${cat.key}`;
+    badge.textContent = cat.label;
+
+    document.getElementById("riskHint").textContent = cat.hint;
+  }
+
+  function updateTreatmentChips(){
+    const chipsRoot = document.getElementById("treatmentChips");
+    chipsRoot.innerHTML = "";
+
+    const section = SECTIONS.find(s => s.id === "treatment");
+    const set = state.multi["treatment"] || new Set();
+
+    if (set.size === 0){
+      const empty = document.createElement("div");
+      empty.className = "mini";
+      empty.textContent = "No treatment items selected.";
+      chipsRoot.appendChild(empty);
+      return;
+    }
+
+    for (const key of Array.from(set)){
+      const opt = getOptionByKey(section, key);
+      if (!opt) continue;
+
+      const chip = document.createElement("div");
+      chip.className = "chip";
+
+      const icon = opt.details ? opt.details : "💊";
+      chip.innerHTML = `<span>${icon}</span><span>${opt.label}</span><span class="k">${opt.score}</span>`;
+
+      const x = document.createElement("span");
+      x.className = "x";
+      x.textContent = "×";
+      x.title = "Remove";
+      x.addEventListener("click", () => {
+        // uncheck the corresponding checkbox
+        state.multi["treatment"].delete(key);
+        // update UI checkbox
+        const box = document.querySelector(`input[type="checkbox"][name="treatment"][value="${CSS.escape(key)}"]`);
+        if (box) box.checked = false;
+        updateSummary();
+        updateTreatmentChips();
+      });
+
+      chip.appendChild(x);
+      chipsRoot.appendChild(chip);
+    }
+  }
+
+  // ---------- BUTTONS ----------
+  document.getElementById("btnReset").addEventListener("click", () => {
+    initState();
+    render();
+    updateTreatmentChips();
+  });
+
+  document.getElementById("btnCopy").addEventListener("click", async () => {
+    const total = computeTotal();
+    const cat = riskCategory(total);
+
+    const lines = [];
+    lines.push(`DAR Fasting Risk Assessment Tool (2026)`);
+    lines.push(`Total score: ${fmt(total)}`);
+    lines.push(`Category: ${cat.label}`);
+    lines.push(``);
+
+    // selections summary
+    for (const section of SECTIONS){
+      if (section.type === "single"){
+        const opt = getOptionByKey(section, state.single[section.id]);
+        lines.push(`${section.title}: ${opt ? opt.label : "-" } (${opt ? opt.score : "?"})`);
+      } else {
+        const set = state.multi[section.id] || new Set();
+        const picked = Array.from(set).map(k => {
+          const o = getOptionByKey(section, k);
+          return o ? `${o.label} (${o.score})` : "";
+        }).filter(Boolean);
+        lines.push(`${section.title}: ${picked.length ? picked.join("; ") : "None"} `);
+      }
+    }
+
+    try{
+      await navigator.clipboard.writeText(lines.join("\n"));
+      alert("Summary copied to clipboard.");
+    }catch{
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = lines.join("\n");
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      alert("Summary copied (fallback).");
+    }
+  });
+
+  // ---------- INIT ----------
+  initState();
+  render();
+  updateTreatmentChips();
+</script>
+</body>
+</html>
