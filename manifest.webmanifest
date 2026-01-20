@@ -1,0 +1,13 @@
+{
+  "name": "DAR Fasting Risk Tool (2026)",
+  "short_name": "DAR Risk 2026",
+  "start_url": "/DM-Risk2026/",
+  "scope": "/DM-Risk2026/",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
