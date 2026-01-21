@@ -1,6 +1,6 @@
 // sw.js — simple offline cache for GitHub Pages PWA
 
-const CACHE_NAME = "dar-risk-2026-v1";
+const CACHE_NAME = "dar-risk-2026-v2"; // <-- change this when you update files
 const ASSETS = [
   "./",
   "./index.html",
@@ -49,7 +49,9 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
           return res;
         })
-        .catch(() => caches.match(req).then((c) => c || caches.match("./index.html")))
+        .catch(() =>
+          caches.match(req).then((c) => c || caches.match("./index.html"))
+        )
     );
     return;
   }
